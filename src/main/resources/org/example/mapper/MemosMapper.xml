@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.mapper.MemosMapper">
+  <resultMap id="BaseResultMap" type="org.example.model.Memo">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="title" jdbcType="VARCHAR" property="title" />
+    <result column="body" jdbcType="VARCHAR" property="body" />
+    <result column="user" jdbcType="VARCHAR" property="user" />
+  </resultMap>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select * from memos
+  </select>
+  <select id="selectByUser" resultMap="BaseResultMap">
+    select * from memos where user=#{user}
+  </select>
+  <select id="selectById" parameterType="String" resultMap="BaseResultMap">
+    select * from memos where id=#{id}
+  </select>
+  <insert id="insert" keyProperty="id" parameterType="org.example.model.Memo" useGeneratedKeys="true">
+    insert into memos (title, body, user) values (#{title}, #{body}, #{user})
+  </insert>
+  <update id="updateById" keyProperty="id" parameterType="org.example.model.Memo" useGeneratedKeys="true">
+    update memos set title=#{title}, body=#{body} where id=#{id} and user=#{user}
+  </update>
+  <delete id="deleteById" parameterType="org.example.model.Memo">
+    delete from memos where id=#{id} and user=#{user}
+  </delete>
+</mapper>

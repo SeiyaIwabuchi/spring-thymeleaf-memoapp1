@@ -1,0 +1,65 @@
+plugins {
+    id 'java'
+}
+
+group 'org.example'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'com.mysql:mysql-connector-j:8.0.32'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+    runtimeOnly 'org.mybatis.generator:mybatis-generator-core:1.4.2'
+    // https://mvnrepository.com/artifact/org.projectlombok/lombok
+    compileOnly 'org.projectlombok:lombok:1.18.24'
+    annotationProcessor 'org.projectlombok:lombok:1.18.26'
+    // https://mvnrepository.com/artifact/org.mybatis.spring.boot/mybatis-spring-boot-starter
+    implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.1'
+
+    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-web
+    implementation 'org.springframework.boot:spring-boot-starter-web:3.0.3'
+    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-thymeleaf
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf:3.0.3'
+
+    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-devtools
+    compileOnly 'org.springframework.boot:spring-boot-devtools:3.0.2'
+
+    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-security
+    implementation 'org.springframework.boot:spring-boot-starter-security:3.0.2'
+
+}
+
+test {
+    useJUnitPlatform()
+}
+
+ant.condition(property: "os", value: "windows") { os(family: "windows") }
+ant.condition(property: "os", value: "unix"   ) { os(family: "unix")    }
+
+task migrate(type: Exec) {
+    def migrateBin = "thirdparty/mybatis-migrations-3.3.11-bundle/mybatis-migrations-3.3.11/bin/migrate.cmd"
+    def path="migrations"
+    if (ant.properties.os == "unix")
+        migrateBin = "thirdparty/mybatis-migrations-3.3.11-bundle/mybatis-migrations-3.3.11/bin/migrate"
+    onlyIf {
+        project.hasProperty("args")
+    }
+    doFirst {
+        def command = [migrateBin, "--path="+path, *project.args.split(" ")]
+        println(">> OS: " + ant.properties.os)
+        println(">> " + command.join(" "))
+        commandLine(command)
+    }
+}
+
+task genMybatisCodes(type: Exec) {
+    def jar = "thirdparty/mybatis-generator-core-1.4.2.jar"
+    def config = "conf/generatorConfig.xml"
+    def command = ["java", "-jar", jar, "-configfile", config]
+    println(">> " + command.join(" "))
+    commandLine(command)
+}
