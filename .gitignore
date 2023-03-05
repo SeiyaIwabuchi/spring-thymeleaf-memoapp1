@@ -1,2 +1,5 @@
 /.gradle/
 /build/
+/conf/generatorConfig.xml
+/migrations/environments/development.properties
+/src/main/resources/application.properties
